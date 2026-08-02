@@ -1,0 +1,41 @@
+/*
+  کاوان — پالت طراحی
+  ایده: مسیر کاروان تجاری قدیمی؛ رنگ فیروزه‌ای عمیق (سنتی ایرانی) در کنار
+  زعفرانی گرم برای لهجه. مینیمال در فروشگاه، رسمی‌تر در پنل ادمین.
+*/
+:root {
+  /* رنگ‌ها */
+  --color-primary: #1f4b43;
+  --color-primary-dark: #143530;
+  --color-primary-light: #2e6b5e;
+  --color-accent: #e3a857;
+  --color-accent-dark: #c98a3b;
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-sand: #efe6d8;
+  --color-text: #23201b;
+  --color-text-muted: #6b6558;
+  --color-border: #e4dccb;
+  --color-danger: #b3452c;
+  --color-success: #2e6b5e;
+
+  /* تایپوگرافی */
+  --font-main: "Vazirmatn", Tahoma, sans-serif;
+
+  /* اندازه‌ها */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 1px 3px rgba(35, 32, 27, 0.08);
+  --shadow-md: 0 8px 24px rgba(35, 32, 27, 0.1);
+  --header-height: 68px;
+  --container-width: 1240px;
+}
+
+/* پنل ادمین از یک تِم فرعی رسمی‌تر استفاده می‌کند */
+.admin-theme {
+  --color-bg: #f4f5f4;
+  --color-surface: #ffffff;
+  --radius: 8px;
+  --shadow-md: 0 2px 10px rgba(20, 30, 28, 0.08);
+}
