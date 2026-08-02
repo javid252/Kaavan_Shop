@@ -18,10 +18,11 @@ class ProductFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
     category = django_filters.CharFilter(field_name="category__slug")
     vendor = django_filters.CharFilter(field_name="vendor__store_slug")
+    is_active = django_filters.BooleanFilter(field_name="is_active")
 
     class Meta:
         model = Product
-        fields = ["min_price", "max_price", "category", "vendor", "is_featured"]
+        fields = ["min_price", "max_price", "category", "vendor", "is_featured", "is_active"]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

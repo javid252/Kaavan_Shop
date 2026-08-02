@@ -1,14 +1,12 @@
 <template>
   <div class="admin-shell">
     <aside class="admin-sidebar">
-      <router-link to="/" class="admin-brand">🎨 یاشیل آرت <span>ادمین</span></router-link>
+      <router-link to="/" class="admin-brand">🎨 یاشیل آرت <span>پنل فروشنده</span></router-link>
+      <div class="vendor-store-name">{{ storeName }}</div>
       <nav class="admin-nav">
-        <router-link to="/admin/dashboard">📊 داشبورد</router-link>
-        <router-link to="/admin/products">📦 محصولات</router-link>
-        <router-link to="/admin/orders">🧾 سفارش‌ها</router-link>
-        <router-link to="/admin/users">👥 کاربران</router-link>
-        <router-link v-if="multivendorEnabled" to="/admin/vendors">🏪 فروشندگان</router-link>
-        <router-link to="/admin/settings">⚙️ تنظیمات</router-link>
+        <router-link to="/vendor/dashboard">📊 داشبورد</router-link>
+        <router-link to="/vendor/products">📦 محصولات من</router-link>
+        <router-link to="/vendor/profile">🏪 پروفایل فروشگاه</router-link>
       </nav>
       <router-link to="/" class="admin-back">← بازگشت به فروشگاه</router-link>
     </aside>
@@ -29,9 +27,12 @@
 import { mapGetters } from "vuex";
 
 export default {
-  name: "AdminLayout",
+  name: "VendorLayout",
   computed: {
-    ...mapGetters("platform", ["multivendorEnabled"]),
+    ...mapGetters("vendor", ["profile"]),
+    storeName() {
+      return this.profile ? this.profile.store_name : "";
+    },
     userLabel() {
       const u = this.$store.getters["auth/currentUser"];
       return u ? u.first_name || u.username : "";
@@ -66,7 +67,7 @@ export default {
   font-weight: 900;
   font-size: 1.05rem;
   color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 4px;
   padding: 0 8px;
 }
 .admin-brand span {
@@ -74,6 +75,12 @@ export default {
   font-size: 0.75rem;
   font-weight: 600;
   margin-right: 6px;
+}
+.vendor-store-name {
+  padding: 0 8px;
+  margin-bottom: 26px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 .admin-nav {
   display: flex;

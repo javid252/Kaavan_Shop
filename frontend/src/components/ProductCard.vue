@@ -16,6 +16,7 @@
     <div class="product-card__body">
       <span class="text-muted product-card__category">{{ product.category_name }}</span>
       <h3 class="product-card__title">{{ product.name }}</h3>
+      <span v-if="product.vendor_name" class="product-card__vendor">🏪 {{ product.vendor_name }}</span>
       <div class="product-card__price">
         <span class="price">{{ formatPrice(product.final_price) }} تومان</span>
         <span v-if="product.discount_price" class="price-old">{{ formatPrice(product.price) }}</span>
@@ -91,6 +92,11 @@ export default {
   font-weight: 700;
   line-height: 1.4;
   min-height: 2.6em;
+}
+.product-card__vendor {
+  font-size: 0.72rem;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 .product-card__price {
   margin-top: 4px;

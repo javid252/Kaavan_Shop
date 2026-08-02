@@ -10,6 +10,8 @@ const routes = [
   { path: "/products", name: "product-list", component: () => import("@/views/ProductList.vue") },
   { path: "/products/:slug", name: "product-detail", component: () => import("@/views/ProductDetail.vue") },
   { path: "/cart", name: "cart", component: () => import("@/views/Cart.vue") },
+  { path: "/stores", name: "store-list", component: () => import("@/views/VendorStoreList.vue") },
+  { path: "/store/:slug", name: "vendor-store", component: () => import("@/views/VendorStore.vue") },
   {
     path: "/checkout",
     name: "checkout",
@@ -53,6 +55,12 @@ const routes = [
     meta: { guestOnly: true },
   },
   {
+    path: "/become-vendor",
+    name: "become-vendor",
+    component: () => import("@/views/BecomeVendor.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/admin",
     component: () => import("@/views/admin/AdminLayout.vue"),
     meta: { requiresAuth: true, requiresAdmin: true },
@@ -72,6 +80,29 @@ const routes = [
       },
       { path: "orders", name: "admin-orders", component: () => import("@/views/admin/AdminOrders.vue") },
       { path: "users", name: "admin-users", component: () => import("@/views/admin/AdminUsers.vue") },
+      { path: "vendors", name: "admin-vendors", component: () => import("@/views/admin/AdminVendors.vue") },
+      { path: "settings", name: "admin-settings", component: () => import("@/views/admin/AdminSettings.vue") },
+    ],
+  },
+  {
+    path: "/vendor",
+    component: () => import("@/views/vendor/VendorLayout.vue"),
+    meta: { requiresAuth: true, requiresVendor: true },
+    children: [
+      { path: "", redirect: { name: "vendor-dashboard" } },
+      { path: "dashboard", name: "vendor-dashboard", component: () => import("@/views/vendor/VendorDashboard.vue") },
+      { path: "products", name: "vendor-products", component: () => import("@/views/vendor/VendorProducts.vue") },
+      {
+        path: "products/new",
+        name: "vendor-product-new",
+        component: () => import("@/views/vendor/VendorProductForm.vue"),
+      },
+      {
+        path: "products/:slug/edit",
+        name: "vendor-product-edit",
+        component: () => import("@/views/vendor/VendorProductForm.vue"),
+      },
+      { path: "profile", name: "vendor-profile", component: () => import("@/views/vendor/VendorProfile.vue") },
     ],
   },
   { path: "*", name: "not-found", component: () => import("@/views/NotFound.vue") },
@@ -85,7 +116,7 @@ const router = new VueRouter({
   },
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const isAuthenticated = store.getters["auth/isAuthenticated"];
   const isAdmin = store.getters["auth/isAdmin"];
 
@@ -97,6 +128,14 @@ router.beforeEach((to, from, next) => {
   }
   if (to.meta.guestOnly && isAuthenticated) {
     return next({ name: "home" });
+  }
+  if (to.meta.requiresVendor) {
+    if (!store.state.vendor.checked) {
+      await store.dispatch("vendor/fetchMe");
+    }
+    if (!store.getters["vendor/isApprovedVendor"]) {
+      return next({ name: "become-vendor" });
+    }
   }
   next();
 });

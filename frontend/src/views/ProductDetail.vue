@@ -24,6 +24,9 @@
       <div class="info">
         <span class="text-muted">{{ product.category && product.category.name }}</span>
         <h1>{{ product.name }}</h1>
+        <router-link v-if="product.vendor_slug" :to="`/store/${product.vendor_slug}`" class="vendor-link">
+          🏪 فروشنده: {{ product.vendor_name }}
+        </router-link>
 
         <div class="price-row">
           <span class="price">{{ formatPrice(currentPrice) }} تومان</span>
@@ -219,6 +222,16 @@ export default {
 .info h1 {
   font-size: 1.7rem;
   margin: 8px 0 14px;
+}
+.vendor-link {
+  display: inline-block;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-sand);
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
 }
 .price-row {
   display: flex;

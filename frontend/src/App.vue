@@ -1,10 +1,10 @@
 <template>
-  <div id="app-shell" :class="{ 'admin-theme': isAdminRoute }">
-    <AppHeader v-if="!isAdminRoute" />
+  <div id="app-shell" :class="{ 'admin-theme': isBareLayout }">
+    <AppHeader v-if="!isBareLayout" />
     <main class="main-content">
       <router-view />
     </main>
-    <AppFooter v-if="!isAdminRoute" />
+    <AppFooter v-if="!isBareLayout" />
     <ToastStack />
   </div>
 </template>
@@ -18,9 +18,15 @@ export default {
   name: "App",
   components: { AppHeader, AppFooter, ToastStack },
   computed: {
-    isAdminRoute() {
-      return this.$route.path.startsWith("/admin");
+    isBareLayout() {
+      return this.$route.path.startsWith("/admin") || this.$route.path.startsWith("/vendor");
     },
+  },
+  created() {
+    this.$store.dispatch("platform/fetchSettings");
+    if (this.$store.getters["auth/isAuthenticated"]) {
+      this.$store.dispatch("vendor/fetchMe");
+    }
   },
 };
 </script>

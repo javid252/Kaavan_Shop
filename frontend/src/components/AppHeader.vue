@@ -2,14 +2,16 @@
   <header class="site-header">
     <div class="container header-inner">
       <router-link to="/" class="brand">
-        <span class="brand__mark">🐫</span>
-        <span class="brand__name">کاوان</span>
+        <span class="brand__mark">🎨</span>
+        <span class="brand__name">یاشیل آرت</span>
       </router-link>
 
       <nav class="main-nav">
         <router-link to="/" exact>خانه</router-link>
         <router-link to="/products">محصولات</router-link>
+        <router-link v-if="multivendorEnabled" to="/stores">فروشگاه‌ها</router-link>
         <router-link v-if="isAuthenticated" to="/my-orders">سفارش‌های من</router-link>
+        <router-link v-if="isApprovedVendor" to="/vendor">پنل فروشنده</router-link>
         <router-link v-if="isAdmin" to="/admin">پنل ادمین</router-link>
       </nav>
 
@@ -25,6 +27,9 @@
           </button>
           <div v-if="menuOpen" class="user-menu__dropdown" @click="menuOpen = false">
             <router-link to="/my-orders">سفارش‌های من</router-link>
+            <router-link v-if="isApprovedVendor" to="/vendor">پنل فروشنده</router-link>
+            <router-link v-else-if="multivendorEnabled && !isVendor" to="/become-vendor">فروشنده شوید</router-link>
+            <router-link v-else-if="isVendor" to="/become-vendor">وضعیت درخواست فروشندگی</router-link>
             <button class="logout-btn" @click="logout">خروج</button>
           </div>
         </div>
@@ -45,6 +50,8 @@ export default {
   computed: {
     ...mapGetters("auth", ["isAuthenticated", "isAdmin", "currentUser"]),
     ...mapGetters("cart", ["itemCount"]),
+    ...mapGetters("platform", ["multivendorEnabled"]),
+    ...mapGetters("vendor", ["isVendor", "isApprovedVendor"]),
     userLabel() {
       return this.currentUser
         ? this.currentUser.first_name || this.currentUser.username
