@@ -20,13 +20,10 @@ export default {
   actions: {
     async fetchCategories({ commit, state }) {
       if (state.categories.length) return state.categories;
-
       const { data } = await api.get("/categories/");
-
-      // اصلاح اصلی
-      commit("SET_CATEGORIES", data.results || data);
-
-      return data.results || data;
+      const categories = data.results || data; // اندپوینت صفحه‌بندی‌شده است
+      commit("SET_CATEGORIES", categories);
+      return categories;
     },
   },
 };

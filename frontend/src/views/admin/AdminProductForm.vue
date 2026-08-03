@@ -67,7 +67,7 @@ export default {
   components: { AppLoader },
   data() {
     return {
-      loading: false,
+      loading: true,
       submitting: false,
       errorMessage: "",
       categories: [],
@@ -75,6 +75,10 @@ export default {
         name: "", category: null, description: "", price: 0,
         discount_price: null, stock: 0, is_active: true, is_featured: false,
       },
+      productId: null,
+      images: [],
+      pendingFiles: [],
+      uploadingImage: false,
     };
   },
   computed: {
@@ -82,29 +86,52 @@ export default {
       return !!this.$route.params.slug;
     },
   },
-  async created() {
-    const { data } = await api.get("/categories/");
-    this.categories = data;
-    if (this.isEdit) {
+  created() {
+    this.loadForm();
+  },
+  watch: {
+    "$route.params.slug"() {
+      this.loadForm();
+    },
+  },
+  methods: {
+    async loadForm() {
       this.loading = true;
+      this.errorMessage = "";
       try {
-        const { data: product } = await api.get(`/products/${this.$route.params.slug}/`);
-        this.form = {
-          name: product.name,
-          category: product.category ? product.category.id : null,
-          description: product.description,
-          price: Number(product.price),
-          discount_price: product.discount_price ? Number(product.discount_price) : null,
-          stock: product.stock,
-          is_active: product.is_active !== undefined ? product.is_active : true,
-          is_featured: product.is_featured,
-        };
+        const { data } = await api.get("/categories/");
+        this.categories = data.results || data;
+
+        if (this.isEdit) {
+          const { data: product } = await api.get(`/products/${this.$route.params.slug}/`);
+          this.productId = product.id;
+          this.images = product.images;
+          this.form = {
+            name: product.name,
+            category: product.category ? product.category.id : null,
+            description: product.description,
+            price: Number(product.price),
+            discount_price: product.discount_price ? Number(product.discount_price) : null,
+            stock: product.stock,
+            is_active: product.is_active !== undefined ? product.is_active : true,
+            is_featured: product.is_featured,
+          };
+        } else {
+          this.productId = null;
+          this.images = [];
+          this.form = {
+            name: "", category: null, description: "", price: 0,
+            discount_price: null, stock: 0, is_active: true, is_featured: false,
+          };
+        }
+      } catch (e) {
+        this.errorMessage = this.isEdit
+          ? "بارگذاری اطلاعات محصول ناموفق بود. ممکن است محصول حذف شده باشد یا اتصال به سرور برقرار نشود."
+          : "بارگذاری دسته‌بندی‌ها ناموفق بود. اتصال به سرور را بررسی کنید.";
       } finally {
         this.loading = false;
       }
-    }
-  },
-  methods: {
+    },
     async submit() {
       this.submitting = true;
       this.errorMessage = "";
@@ -113,14 +140,63 @@ export default {
           await api.patch(`/products/${this.$route.params.slug}/`, this.form);
           this.$store.dispatch("notify", { message: "محصول با موفقیت به‌روزرسانی شد." });
         } else {
-          await api.post("/products/", this.form);
-          this.$store.dispatch("notify", { message: "محصول جدید ثبت شد." });
+          const { data } = await api.post("/products/", this.form);
+          this.productId = data.id;
+          this.$store.dispatch("notify", { message: "محصول ثبت شد؛ حالا می‌توانید تصویر اضافه کنید." });
+          this.$router.replace(`/admin/products/${data.slug}/edit`);
+          return;
         }
         this.$router.push("/admin/products");
       } catch (e) {
         this.errorMessage = "ذخیره محصول ناموفق بود. مقادیر را بررسی کنید.";
       } finally {
         this.submitting = false;
+      }
+    },
+    onFilesSelected(event) {
+      this.pendingFiles = Array.from(event.target.files || []);
+    },
+    async uploadImages() {
+      if (!this.pendingFiles.length) return;
+      this.uploadingImage = true;
+      try {
+        for (const file of this.pendingFiles) {
+          const formData = new FormData();
+          formData.append("product", this.productId);
+          formData.append("image", file);
+          formData.append("is_main", this.images.length === 0 ? "true" : "false");
+          const { data } = await api.post("/product-images/", formData);
+          this.images.push(data);
+        }
+        this.pendingFiles = [];
+        this.$refs.fileInput.value = "";
+        this.$store.dispatch("notify", { message: "تصاویر با موفقیت آپلود شدند." });
+      } catch (e) {
+        this.$store.dispatch("notify", { message: "آپلود تصویر ناموفق بود.", type: "error" });
+      } finally {
+        this.uploadingImage = false;
+      }
+    },
+    async setMainImage(img) {
+      try {
+        const previousMain = this.images.find((i) => i.is_main);
+        if (previousMain) {
+          await api.patch(`/product-images/${previousMain.id}/`, { is_main: false });
+          previousMain.is_main = false;
+        }
+        await api.patch(`/product-images/${img.id}/`, { is_main: true });
+        img.is_main = true;
+      } catch (e) {
+        this.$store.dispatch("notify", { message: "تغییر تصویر اصلی ناموفق بود.", type: "error" });
+      }
+    },
+    async deleteImage(img) {
+      if (!confirm("این تصویر حذف شود؟")) return;
+      try {
+        await api.delete(`/product-images/${img.id}/`);
+        this.images = this.images.filter((i) => i.id !== img.id);
+      } catch (e) {
+        this.$store.dispatch("notify", { message: "حذف تصویر ناموفق بود.", type: "error" });
       }
     },
   },

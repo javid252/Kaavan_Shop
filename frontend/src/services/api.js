@@ -4,6 +4,7 @@ export const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "http://127.0.0.
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 20000, // اگر سرور/پروکسی درخواست را رها کند، بعد از ۲۰ ثانیه خطای واضح می‌دهیم
 });
 
 api.interceptors.request.use((config) => {
