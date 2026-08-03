@@ -55,6 +55,34 @@
         </button>
       </div>
     </form>
+
+    <div v-if="!loading && productId" class="card image-card">
+      <h3>تصاویر محصول</h3>
+      <p class="text-muted image-hint">اولین تصویر به‌صورت خودکار تصویر اصلی محصول در نظر گرفته می‌شود.</p>
+
+      <div class="image-grid">
+        <div v-for="img in images" :key="img.id" class="image-item">
+          <img :src="img.image" :alt="form.name" />
+          <span v-if="img.is_main" class="badge badge-accent image-item__main-badge">تصویر اصلی</span>
+          <div class="image-item__actions">
+            <button v-if="!img.is_main" type="button" class="btn btn-outline btn-sm" @click="setMainImage(img)">
+              تصویر اصلی کن
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" @click="deleteImage(img)">حذف</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-upload-row">
+        <input ref="fileInput" type="file" accept="image/*" multiple @change="onFilesSelected" />
+        <button type="button" class="btn btn-accent btn-sm" :disabled="uploadingImage || !pendingFiles.length" @click="uploadImages">
+          {{ uploadingImage ? "در حال آپلود..." : "آپلود تصویر(های) انتخاب‌شده" }}
+        </button>
+      </div>
+    </div>
+    <div v-else-if="!loading && !isEdit" class="card image-card">
+      <p class="text-muted">برای افزودن تصویر، اول محصول را ذخیره کنید؛ بعد از ذخیره، بخش آپلود تصویر همین‌جا نمایش داده می‌شود.</p>
+    </div>
   </div>
 </template>
 
@@ -241,5 +269,52 @@ export default {
 .form-actions {
   display: flex;
   justify-content: flex-end;
+}
+.image-card {
+  max-width: 720px;
+  padding: 26px;
+  margin-top: 20px;
+}
+.image-card h3 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.image-hint {
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+}
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.image-item {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.image-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+.image-item__main-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.image-item__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+}
+.image-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 </style>

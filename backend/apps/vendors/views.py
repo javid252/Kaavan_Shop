@@ -2,6 +2,8 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.access.permissions import IsAdminWithModelPerm, IsSuperUser
+
 from .models import PlatformSettings, Vendor
 from .permissions import IsApprovedVendor
 from .serializers import (
@@ -25,9 +27,9 @@ class PublicSettingsView(APIView):
 
 
 class AdminSettingsView(APIView):
-    """کلید روشن/خاموش چندفروشندگی - فقط ادمین."""
+    """کلید روشن/خاموش چندفروشندگی - تصمیم کلان کسب‌وکار، فقط ادمین اصلی (superuser)."""
 
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsSuperUser]
 
     def get(self, request):
         return Response(PlatformSettingsSerializer(PlatformSettings.load()).data)
@@ -92,5 +94,5 @@ class AdminVendorViewSet(viewsets.ModelViewSet):
 
     queryset = Vendor.objects.all().select_related("user")
     serializer_class = VendorAdminSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminWithModelPerm]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]

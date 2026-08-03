@@ -1,40 +1,10 @@
 <template>
   <div class="home">
-    <section class="hero">
-      <div class="container hero-inner">
-        <div class="hero-copy fade-in">
-          <span class="eyebrow">فروشگاه آنلاین کاوان</span>
-          <h1>هر خرید، آغاز یک مسیر مطمئن</h1>
-          <p class="text-muted">
-            از پوشاک و کیف و کفش تا لوازم دیجیتال و خانه — کاوان محصولات را از
-            تولیدکننده به‌دستِ شما می‌رساند؛ سریع، اصل و با ضمانت بازگشت کالا.
-          </p>
-          <div class="hero-actions">
-            <router-link to="/products" class="btn btn-accent">مشاهده محصولات</router-link>
-            <router-link to="/products?featured=1" class="btn btn-outline">پیشنهادهای ویژه</router-link>
-          </div>
-        </div>
-        <div class="hero-art fade-in" aria-hidden="true">
-          <div class="hero-art__circle">🐫</div>
-        </div>
-      </div>
-    </section>
+    <HeroSlider />
 
-    <section class="container categories-section">
-      <span class="eyebrow">دسته‌بندی‌ها</span>
-      <h2>مسیر خرید خود را انتخاب کنید</h2>
-      <div class="category-route">
-        <router-link
-          v-for="cat in categories"
-          :key="cat.id"
-          :to="`/products?category=${cat.slug}`"
-          class="category-stop"
-        >
-          <span class="category-stop__icon">{{ cat.icon || "🛍️" }}</span>
-          <span class="category-stop__name">{{ cat.name }}</span>
-        </router-link>
-      </div>
-    </section>
+    <CategoryGrid
+      :categories="categories"
+    />
 
     <RouteDivider />
 
@@ -60,10 +30,18 @@ import api from "@/services/api";
 import AppLoader from "@/components/AppLoader.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import RouteDivider from "@/components/RouteDivider.vue";
+import HeroSlider from "@/components/HeroSlider.vue";
+import CategoryGrid from "@/components/CategoryGrid.vue";
 
 export default {
   name: "HomeView",
-  components: { ProductCard, RouteDivider, AppLoader },
+  components: {
+    ProductCard,
+    RouteDivider,
+    AppLoader,
+    HeroSlider,
+    CategoryGrid
+  },
   data() {
     return { featured: [], loading: true };
   },

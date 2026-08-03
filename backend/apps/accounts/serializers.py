@@ -7,13 +7,26 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
             "id", "username", "email", "first_name", "last_name",
-            "phone_number", "is_staff", "is_active", "date_joined",
+            "phone_number", "is_staff", "is_superuser", "is_active",
+            "permissions", "date_joined",
         ]
-        read_only_fields = ["id", "is_staff", "date_joined"]
+        read_only_fields = ["id", "is_staff", "is_superuser", "date_joined"]
+
+    def get_permissions(self, obj):
+        if obj.is_superuser:
+            from django.contrib.auth.models import Permission
+
+            from apps.access.serializers import MANAGEABLE_APPS
+
+            perms = Permission.objects.filter(content_type__app_label__in=MANAGEABLE_APPS).select_related("content_type")
+            return [f"{p.content_type.app_label}.{p.codename}" for p in perms]
+        return sorted(obj.get_all_permissions())
 
 
 class RegisterSerializer(serializers.ModelSerializer):

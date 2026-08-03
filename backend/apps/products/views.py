@@ -1,8 +1,8 @@
 from django_filters import rest_framework as django_filters
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 
 from .models import Category, Product, ProductImage, ProductVariant
-from .permissions import IsAdminOrReadOnly, IsAdminOrVendorOwner
+from .permissions import CanManageProductRelated, IsAdminOrReadOnly, IsAdminOrVendorOwner
 from .serializers import (
     CategorySerializer,
     ProductDetailSerializer,
@@ -46,9 +46,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         vendor = getattr(user, "vendor_profile", None) if user and user.is_authenticated else None
 
         if is_staff:
-            return qs  # ادمین همه محصولات (فعال/غیرفعال، همه فروشنده‌ها) را می‌بیند
+            return qs
         if vendor and self.request.query_params.get("mine") == "1":
-            # فروشنده صفحه «محصولات من» را می‌خواهد: شامل غیرفعال‌های خودش هم می‌شود
             return qs.filter(vendor=vendor)
         return qs.filter(is_active=True)
 
@@ -64,7 +63,6 @@ class ProductViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             serializer.save()
             return
-        # فروشنده غیرادمین: صرف‌نظر از چیزی که در body فرستاده، فروشنده = خودش
         vendor = getattr(user, "vendor_profile", None)
         serializer.save(vendor=vendor)
 
@@ -73,18 +71,31 @@ class ProductViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             serializer.save()
             return
-        # فروشنده نمی‌تواند مالکیت محصول را به فروشنده دیگری تغییر دهد
         vendor = getattr(user, "vendor_profile", None)
         serializer.save(vendor=vendor)
 
 
 class ProductImageViewSet(viewsets.ModelViewSet):
-    queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [CanManageProductRelated]
+
+    def get_queryset(self):
+        qs = ProductImage.objects.select_related("product__vendor")
+        user = self.request.user
+        if user.is_staff:
+            return qs
+        vendor = getattr(user, "vendor_profile", None)
+        return qs.filter(product__vendor=vendor) if vendor else qs.none()
 
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
-    queryset = ProductVariant.objects.all()
     serializer_class = ProductVariantSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [CanManageProductRelated]
+
+    def get_queryset(self):
+        qs = ProductVariant.objects.select_related("product__vendor")
+        user = self.request.user
+        if user.is_staff:
+            return qs
+        vendor = getattr(user, "vendor_profile", None)
+        return qs.filter(product__vendor=vendor) if vendor else qs.none()

@@ -4,6 +4,8 @@ from apps.products.models import Product, ProductVariant
 
 from .models import Order, OrderItem
 
+from apps.inventory.models import StockMovement
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,11 +83,16 @@ class CheckoutSerializer(serializers.Serializer):
                 quantity=quantity,
             )
 
-            if variant:
-                variant.stock -= quantity
-                variant.save(update_fields=["stock"])
-            product.stock = max(product.stock - quantity, 0)
-            product.save(update_fields=["stock"])
+            
+
+            StockMovement.record(
+                product=product,
+                variant=variant,
+                movement_type=StockMovement.MovementType.SALE,
+                quantity=quantity,
+                reference=f"سفارش #{order.id}",
+                user=user,
+            )
 
         order.recalculate_total()
         return order

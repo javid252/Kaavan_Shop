@@ -1,6 +1,8 @@
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 
+from apps.access.permissions import IsAdminWithModelPerm
+
 from .models import Order
 from .serializers import CheckoutSerializer, OrderSerializer, OrderStatusUpdateSerializer
 
@@ -33,7 +35,7 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
 
     queryset = Order.objects.all().prefetch_related("items").select_related("user")
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminWithModelPerm]
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
     def get_serializer_class(self):
@@ -44,4 +46,27 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         response = super().partial_update(request, *args, **kwargs)
         instance = self.get_object()
+
+        if instance.status == Order.Status.PAID:
+            self._ensure_income_transaction(instance, request.user)
+
         return Response(OrderSerializer(instance).data)
+
+    @staticmethod
+    def _ensure_income_transaction(order, user):
+        """اگر برای این سفارش قبلاً تراکنش درآمدی ثبت نشده، یکی خودکار می‌سازد."""
+        from django.utils import timezone
+
+        from apps.accounting.models import Transaction
+
+        if Transaction.objects.filter(related_order=order).exists():
+            return
+        Transaction.objects.create(
+            type=Transaction.Type.INCOME,
+            amount=order.total_price,
+            description=f"درآمد سفارش #{order.id}",
+            related_order=order,
+            is_automatic=True,
+            created_by=user,
+            occurred_at=timezone.now().date(),
+        )
