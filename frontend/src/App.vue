@@ -32,6 +32,7 @@ export default {
   created() {
     this.$store.dispatch("platform/fetchSettings");
     if (this.$store.getters["auth/isAuthenticated"]) {
+      this.$store.dispatch("auth/fetchProfile");
       this.$store.dispatch("vendor/fetchMe");
     }
   },

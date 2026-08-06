@@ -1,7 +1,7 @@
 <template>
   <div class="auth-page">
     <form class="auth-card card fade-in" @submit.prevent="submit">
-      <router-link to="/" class="auth-brand">🐫 کاوان</router-link>
+      <router-link to="/" class="auth-brand">🎨 یاشیل آرت</router-link>
       <h1>ساخت حساب کاربری</h1>
 
       <div v-if="errorMessage" class="form-error-box">{{ errorMessage }}</div>

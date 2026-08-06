@@ -20,7 +20,7 @@
               :alt="cat.name"
             />
             <span v-else>
-              🛍️
+              {{ cat.icon || "🛍️" }}
             </span>
           </div>
           <div class="category-name">

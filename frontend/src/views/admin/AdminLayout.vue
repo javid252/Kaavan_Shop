@@ -5,9 +5,13 @@
       <nav class="admin-nav">
         <router-link to="/admin/dashboard">📊 داشبورد</router-link>
         <router-link to="/admin/products">📦 محصولات</router-link>
+        <router-link to="/admin/categories">🗂️ دسته‌بندی‌ها</router-link>
         <router-link to="/admin/orders">🧾 سفارش‌ها</router-link>
         <router-link to="/admin/users">👥 کاربران</router-link>
         <router-link v-if="multivendorEnabled" to="/admin/vendors">🏪 فروشندگان</router-link>
+        <router-link to="/admin/inventory">📊 انبارداری</router-link>
+        <router-link to="/admin/accounting">💰 حسابداری</router-link>
+        <router-link v-if="isSuperUser" to="/admin/roles">🛡️ نقش‌ها و دسترسی‌ها</router-link>
         <router-link to="/admin/settings">⚙️ تنظیمات</router-link>
       </nav>
       <router-link to="/" class="admin-back">← بازگشت به فروشگاه</router-link>
@@ -32,6 +36,7 @@ export default {
   name: "AdminLayout",
   computed: {
     ...mapGetters("platform", ["multivendorEnabled"]),
+    ...mapGetters("auth", ["isSuperUser"]),
     userLabel() {
       const u = this.$store.getters["auth/currentUser"];
       return u ? u.first_name || u.username : "";

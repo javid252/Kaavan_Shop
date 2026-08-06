@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django_filters import rest_framework as django_filters
 from rest_framework import viewsets
 
@@ -19,10 +20,11 @@ class ProductFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category__slug")
     vendor = django_filters.CharFilter(field_name="vendor__store_slug")
     is_active = django_filters.BooleanFilter(field_name="is_active")
+    has_discount = django_filters.BooleanFilter(field_name="discount_price", lookup_expr="isnull", exclude=True)
 
     class Meta:
         model = Product
-        fields = ["min_price", "max_price", "category", "vendor", "is_featured", "is_active"]
+        fields = ["min_price", "max_price", "category", "vendor", "is_featured", "is_active", "has_discount"]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -36,11 +38,15 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrVendorOwner]
     filterset_class = ProductFilter
     search_fields = ["name", "description"]
-    ordering_fields = ["price", "created_at", "name"]
+    ordering_fields = ["price", "created_at", "name", "sales_count"]
     lookup_field = "slug"
 
     def get_queryset(self):
-        qs = Product.objects.select_related("category", "vendor").prefetch_related("images", "variants")
+        qs = (
+            Product.objects.select_related("category", "vendor")
+            .prefetch_related("images", "variants")
+            .annotate(sales_count=Count("order_items"))
+        )
         user = self.request.user
         is_staff = bool(user and user.is_authenticated and user.is_staff)
         vendor = getattr(user, "vendor_profile", None) if user and user.is_authenticated else None

@@ -10,6 +10,7 @@ const routes = [
   { path: "/products", name: "product-list", component: () => import("@/views/ProductList.vue") },
   { path: "/products/:slug", name: "product-detail", component: () => import("@/views/ProductDetail.vue") },
   { path: "/cart", name: "cart", component: () => import("@/views/Cart.vue") },
+  { path: "/contact", name: "contact", component: () => import("@/views/Contact.vue") },
   { path: "/stores", name: "store-list", component: () => import("@/views/VendorStoreList.vue") },
   { path: "/store/:slug", name: "vendor-store", component: () => import("@/views/VendorStore.vue") },
   {
@@ -68,6 +69,7 @@ const routes = [
       { path: "", redirect: { name: "admin-dashboard" } },
       { path: "dashboard", name: "admin-dashboard", component: () => import("@/views/admin/AdminDashboard.vue") },
       { path: "products", name: "admin-products", component: () => import("@/views/admin/AdminProducts.vue") },
+      { path: "categories", name: "admin-categories", component: () => import("@/views/admin/AdminCategories.vue") },
       {
         path: "products/new",
         name: "admin-product-new",
@@ -82,6 +84,9 @@ const routes = [
       { path: "users", name: "admin-users", component: () => import("@/views/admin/AdminUsers.vue") },
       { path: "vendors", name: "admin-vendors", component: () => import("@/views/admin/AdminVendors.vue") },
       { path: "settings", name: "admin-settings", component: () => import("@/views/admin/AdminSettings.vue") },
+      { path: "roles", name: "admin-roles", component: () => import("@/views/admin/AdminRoles.vue") },
+      { path: "inventory", name: "admin-inventory", component: () => import("@/views/admin/AdminInventory.vue") },
+      { path: "accounting", name: "admin-accounting", component: () => import("@/views/admin/AdminAccounting.vue") },
     ],
   },
   {

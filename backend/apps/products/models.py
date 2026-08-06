@@ -11,13 +11,18 @@ class Category(models.Model):
     )
     icon = models.CharField(
         "آیکون (نام کلاس یا اموجی)", max_length=50, blank=True,
-        help_text="مثلا 📦 یا نام آیکون",
+        help_text="مثلا 📦 یا نام آیکون - اگر تصویر آپلود نشود، همین نمایش داده می‌شود",
     )
+    image = models.ImageField(
+        "تصویر دسته‌بندی", upload_to="categories/", null=True, blank=True,
+    )
+    is_active = models.BooleanField("فعال / قابل نمایش", default=True)
+    order = models.PositiveIntegerField("ترتیب نمایش", default=0)
 
     class Meta:
         verbose_name = "دسته‌بندی"
         verbose_name_plural = "دسته‌بندی‌ها"
-        ordering = ["name"]
+        ordering = ["order", "name"]
 
     def __str__(self):
         return self.name

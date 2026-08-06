@@ -25,7 +25,7 @@
           <tr v-for="p in products" :key="p.id">
             <td class="product-name-cell">{{ p.name }}</td>
             <td>{{ formatPrice(p.final_price) }}</td>
-            <td :class="{ 'low-stock-text': p.stock <= 5 }">{{ p.stock ?? "—" }}</td>
+            <td :class="{ 'low-stock-text': p.stock <= 5 }">{{ p.stock != null ? p.stock : "—" }}</td>
             <td>
               <span class="badge" :class="p.in_stock ? 'badge-status-paid' : 'badge-status-cancelled'">
                 {{ p.in_stock ? "موجود" : "ناموجود" }}

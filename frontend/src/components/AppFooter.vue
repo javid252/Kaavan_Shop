@@ -2,7 +2,7 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-col">
-        <div class="brand">🐫 کاوان</div>
+        <div class="brand">🎨 یاشیل آرت</div>
         <p class="text-muted">
           فروشگاه آنلاین کاوان؛ مسیری مطمئن از انتخاب تا تحویل درِ خانه.
         </p>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="container">© {{ year }} فروشگاه کاوان — تمامی حقوق محفوظ است.</div>
+      <div class="container">© {{ year }} فروشگاه یاشیل آرت — تمامی حقوق محفوظ است.</div>
     </div>
   </footer>
 </template>

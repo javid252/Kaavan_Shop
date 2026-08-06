@@ -1,7 +1,7 @@
 <template>
   <div class="container not-found">
     <div class="empty-state">
-      <div class="icon">🐫</div>
+      <div class="icon">🎨</div>
       <h1>۴۰۴</h1>
       <p>این مسیر در نقشه کاروان ما وجود ندارد.</p>
       <router-link to="/" class="btn btn-primary">بازگشت به خانه</router-link>

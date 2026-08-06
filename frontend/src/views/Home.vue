@@ -1,17 +1,14 @@
 <template>
   <div class="home">
     <HeroSlider />
-
     <CategoryGrid
       :categories="categories"
     />
-
     <RouteDivider />
-
     <section class="container featured-section">
       <div class="section-heading">
         <div>
-          <span class="eyebrow">پیشنهاد کاوان</span>
+          <span class="eyebrow">پیشنهاد یاشیل آرت</span>
           <h2>محصولات ویژه</h2>
         </div>
         <router-link to="/products" class="see-all">مشاهده همه ←</router-link>
@@ -145,7 +142,7 @@ export default {
 }
 
 .featured-section {
-  padding: 10px 20px 60px;
+  padding: 40px 20px 60px;
 }
 .section-heading {
   display: flex;

@@ -11,13 +11,7 @@
       <div class="filter-group">
         <label>دسته‌بندی</label>
         <div class="filter-options">
-          <button
-            class="filter-chip"
-            :class="{ active: !filters.category }"
-            @click="setCategory('')"
-          >
-            همه
-          </button>
+          <button class="filter-chip" :class="{ active: !filters.category }" @click="setCategory('')">همه</button>
           <button
             v-for="cat in categories"
             :key="cat.id"
@@ -42,9 +36,17 @@
         <label>مرتب‌سازی</label>
         <select v-model="filters.ordering" @change="fetchProducts">
           <option value="-created_at">جدیدترین</option>
+          <option value="-sales_count">پرفروش‌ترین</option>
           <option value="price">ارزان‌ترین</option>
           <option value="-price">گران‌ترین</option>
         </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input type="checkbox" v-model="filters.has_discount" true-value="true" false-value="" @change="fetchProducts" />
+          فقط محصولات تخفیف‌دار
+        </label>
       </div>
     </aside>
 
@@ -88,12 +90,13 @@ export default {
       loading: true,
       debounceTimer: null,
       filters: {
-        search: "",
+        search: this.$route.query.search || "",
         category: this.$route.query.category || "",
         min_price: null,
         max_price: null,
-        ordering: "-created_at",
+        ordering: this.$route.query.ordering || "-created_at",
         is_featured: this.$route.query.featured ? true : undefined,
+        has_discount: this.$route.query.has_discount ? true : undefined,
       },
     };
   },
@@ -108,6 +111,18 @@ export default {
   created() {
     this.$store.dispatch("products/fetchCategories");
     this.fetchProducts();
+  },
+  watch: {
+    "$route.query"(newQuery, oldQuery) {
+      if (JSON.stringify(newQuery) === JSON.stringify(oldQuery)) return;
+      this.filters.search = newQuery.search || "";
+      this.filters.category = newQuery.category || "";
+      this.filters.ordering = newQuery.ordering || "-created_at";
+      this.filters.is_featured = newQuery.featured ? true : undefined;
+      this.filters.has_discount = newQuery.has_discount ? true : undefined;
+      this.page = 1;
+      this.fetchProducts();
+    },
   },
   methods: {
     setCategory(slug) {
@@ -199,6 +214,15 @@ export default {
 .price-inputs {
   display: flex;
   gap: 8px;
+}
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  cursor: pointer;
 }
 .results-header {
   display: flex;

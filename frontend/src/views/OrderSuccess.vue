@@ -1,10 +1,10 @@
 <template>
   <div class="container success-page">
     <div class="success-card card fade-in">
-      <div class="success-icon">🐫</div>
+      <div class="success-icon">🎨</div>
       <h1>سفارش شما ثبت شد!</h1>
       <p class="text-muted">
-        شماره سفارش شما <strong>#{{ $route.params.id }}</strong> است. کاروان کاوان به‌زودی سفارش شما را به مقصد می‌رساند.
+        شماره سفارش شما <strong>#{{ $route.params.id }}</strong> است. کاروان یاشیل آرت به‌زودی سفارش شما را به مقصد می‌رساند.
       </p>
       <div class="success-actions">
         <router-link to="/my-orders" class="btn btn-primary">پیگیری سفارش‌ها</router-link>

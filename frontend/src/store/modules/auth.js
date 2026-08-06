@@ -18,6 +18,12 @@ export default {
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
     isAdmin: (state) => !!(state.user && state.user.is_staff),
+    isSuperUser: (state) => !!(state.user && state.user.is_superuser),
+    permissions: (state) => (state.user && state.user.permissions) || [],
+    hasPermission: (state) => (codename) => {
+      if (state.user && state.user.is_superuser) return true;
+      return !!(state.user && state.user.permissions && state.user.permissions.includes(codename));
+    },
     currentUser: (state) => state.user,
   },
   mutations: {
